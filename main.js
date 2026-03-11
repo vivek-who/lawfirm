@@ -495,9 +495,16 @@
     var disagreeBtn = document.getElementById('disclaimerDisagree');
     if (!overlay || !agreeBtn || !disagreeBtn) return;
 
-    // Show only once per browser session
+    // Safety check: clean up stale state (e.g. bfcache restore), then exit
     if (sessionStorage.getItem('disclaimerAgreed') === 'true') {
-      // Already agreed this session — keep overlay hidden (it starts as display:none)
+      overlay.style.display = 'none';
+      document.body.classList.remove('disclaimer-active');
+      var mainEl2   = document.querySelector('main');
+      var navbarEl2 = document.getElementById('navbar');
+      var footerEl2 = document.getElementById('footer');
+      if (mainEl2)   mainEl2.classList.remove('disclaimer-blur');
+      if (navbarEl2) navbarEl2.classList.remove('disclaimer-blur');
+      if (footerEl2) footerEl2.classList.remove('disclaimer-blur');
       return;
     }
 
@@ -632,5 +639,19 @@
   } else {
     init();
   }
+
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted && sessionStorage.getItem('disclaimerAgreed') === 'true') {
+      var overlay  = document.getElementById('disclaimerOverlay');
+      var mainEl   = document.querySelector('main');
+      var navbarEl = document.getElementById('navbar');
+      var footerEl = document.getElementById('footer');
+      if (overlay)  overlay.style.display = 'none';
+      document.body.classList.remove('disclaimer-active');
+      if (mainEl)   mainEl.classList.remove('disclaimer-blur');
+      if (navbarEl) navbarEl.classList.remove('disclaimer-blur');
+      if (footerEl) footerEl.classList.remove('disclaimer-blur');
+    }
+  });
 
 })();
