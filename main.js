@@ -641,16 +641,26 @@
   }
 
   window.addEventListener('pageshow', function (event) {
-    if (event.persisted && sessionStorage.getItem('disclaimerAgreed') === 'true') {
-      var overlay  = document.getElementById('disclaimerOverlay');
+    if (event.persisted) {
       var mainEl   = document.querySelector('main');
       var navbarEl = document.getElementById('navbar');
       var footerEl = document.getElementById('footer');
-      if (overlay)  overlay.style.display = 'none';
-      document.body.classList.remove('disclaimer-active');
-      if (mainEl)   mainEl.classList.remove('disclaimer-blur');
-      if (navbarEl) navbarEl.classList.remove('disclaimer-blur');
-      if (footerEl) footerEl.classList.remove('disclaimer-blur');
+
+      // Remove page-exit classes left over from the fade-out transition
+      // (these set opacity:0 — the primary cause of the blank screen on back-navigation)
+      if (mainEl)   mainEl.classList.remove('page-exit');
+      if (navbarEl) navbarEl.classList.remove('page-exit');
+      if (footerEl) footerEl.classList.remove('page-exit');
+
+      // Also clean up any stale disclaimer state
+      if (sessionStorage.getItem('disclaimerAgreed') === 'true') {
+        var overlay = document.getElementById('disclaimerOverlay');
+        if (overlay) overlay.style.display = 'none';
+        document.body.classList.remove('disclaimer-active');
+        if (mainEl)   mainEl.classList.remove('disclaimer-blur');
+        if (navbarEl) navbarEl.classList.remove('disclaimer-blur');
+        if (footerEl) footerEl.classList.remove('disclaimer-blur');
+      }
     }
   });
 
